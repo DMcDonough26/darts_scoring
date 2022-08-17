@@ -183,30 +183,30 @@ class Cricket(TeamGame):
                 else:
                     current_turn.darts = input(current_turn.message)
 
-                if current_turn.darts == 'exit':
-                    self.over = True
-                    break
+                    if current_turn.darts == 'exit':
+                        self.over = True
+                        break
 
-                ## this is where you can check to see if the user said "undo"
-                if current_turn.darts == 'undo':
-                    ## if yes, retrive the old stuff
+                    ## this is where you can check to see if the user said "undo"
+                    if current_turn.darts == 'undo':
+                        ## if yes, retrive the old stuff
 
-                    self.next -= 1
-                    self.teams[0].score = int(self.teams[0].backup_score)
-                    self.teams[1].score = int(self.teams[1].backup_score)
+                        self.next -= (1+self.players.count('Opponent'))
+                        self.teams[0].score = int(self.teams[0].backup_score)
+                        self.teams[1].score = int(self.teams[1].backup_score)
 
-                    self.teams[0].numbers = list(self.teams[0].backup_numbers)
-                    self.teams[1].numbers = list(self.teams[1].backup_numbers)
+                        self.teams[0].numbers = list(self.teams[0].backup_numbers)
+                        self.teams[1].numbers = list(self.teams[1].backup_numbers)
 
-                    break
+                        break
 
-                else:
-                    ## update object
-                    self.teams[0].backup_score = int(self.teams[0].score)
-                    self.teams[1].backup_score = int(self.teams[1].score)
+                    else:
+                        ## update object
+                        self.teams[0].backup_score = int(self.teams[0].score)
+                        self.teams[1].backup_score = int(self.teams[1].score)
 
-                    self.teams[0].backup_numbers = list(self.teams[0].numbers)
-                    self.teams[1].backup_numbers = list(self.teams[1].numbers)
+                        self.teams[0].backup_numbers = list(self.teams[0].numbers)
+                        self.teams[1].backup_numbers = list(self.teams[1].numbers)
 
                 if current_turn.darts == 'miss':
                     self.next += 1
@@ -579,24 +579,24 @@ class X01(TeamGame):
                     current_turn.darts = input(current_turn.message)
                 # current_turn.darts = input(current_turn.message)
 
-                if current_turn.darts == 'exit':
-                    self.over = True
-                    break
+                    if current_turn.darts == 'exit':
+                        self.over = True
+                        break
 
-                ## this is where you can check to see if the user said "undo"
-                if current_turn.darts == 'undo':
-                    ## if yes, retrive the old stuff
+                    ## this is where you can check to see if the user said "undo"
+                    if current_turn.darts == 'undo':
+                        ## if yes, retrive the old stuff
 
-                    self.next -= 1
-                    self.teams[0].score = int(self.teams[0].backup_score)
-                    self.teams[1].score = int(self.teams[1].backup_score)
-                    break
+                        self.next -= (1+self.players.count('Opponent'))
+                        self.teams[0].score = int(self.teams[0].backup_score)
+                        self.teams[1].score = int(self.teams[1].backup_score)
+                        break
 
-                else:
-                    ## update object
-                    current_turn.darts = int(current_turn.darts)
-                    self.teams[0].backup_score = int(self.teams[0].score)
-                    self.teams[1].backup_score = int(self.teams[1].score)
+                    else:
+                        ## update object
+                        current_turn.darts = int(current_turn.darts)
+                        self.teams[0].backup_score = int(self.teams[0].score)
+                        self.teams[1].backup_score = int(self.teams[1].score)
 
                 # add current to existing
                 current_turn.team.score -= current_turn.darts
@@ -729,34 +729,34 @@ class Legs(SingleGame):
                         else:
                             current_turn.darts = input(current_turn.message)
 
-                        if current_turn.darts == 'exit':
-                            self.over = True
-                            break
+                            if current_turn.darts == 'exit':
+                                self.over = True
+                                break
 
-                        if current_turn.darts == 'undo':
-                            ## if yes, retrive the old stuff
-                            self.next -= 1
-                            # need a backup lead score
-                            self.leadscore = int(self.backup_leadscore)
-                            # need a backup total lives
-                            self.totallives = int(self.backup_totallives)
-                            # need to backup each players legs
-                            for i in range(len(self.players)):
-                                self.players[i].lives = self.players[i].backup_lives
-                            break
+                            if current_turn.darts == 'undo':
+                                ## if yes, retrive the old stuff
+                                self.next -= (1+self.playernames.count('Opponent'))
+                                # need a backup lead score
+                                self.leadscore = int(self.backup_leadscore)
+                                # need a backup total lives
+                                self.totallives = int(self.backup_totallives)
+                                # need to backup each players legs
+                                for i in range(len(self.players)):
+                                    self.players[i].lives = self.players[i].backup_lives
+                                break
 
-                        else:
-                            ## update object
-                            current_turn.darts = int(current_turn.darts)
+                            else:
+                                ## update object
+                                current_turn.darts = int(current_turn.darts)
 
-                            self.backup_leadscore = int(self.leadscore)
-                            self.backup_totallives = int(self.totallives)
+                                self.backup_leadscore = int(self.leadscore)
+                                self.backup_totallives = int(self.totallives)
 
-                            for i in range(len(self.players)):
-                                self.players[i].backup_lives = self.players[i].lives
+                                for i in range(len(self.players)):
+                                    self.players[i].backup_lives = self.players[i].lives
 
                         if current_turn.darts > self.leadscore:
-                            self.leadscore = current_turn.darts
+                            self.leadscore = int(current_turn.darts)
                             self.next += 1
                             self.printscore()
                             break
@@ -764,6 +764,7 @@ class Legs(SingleGame):
                         else:
                             self.next += 1
                             self.leadscore = 26
+                            # these could be a memory assignment error working correctly
                             current_turn.player.lives -= 1
                             self.totallives -= 1
                             self.printscore()
@@ -901,33 +902,33 @@ class Golf(SingleGame):
                 else:
                     current_turn.darts = input(current_turn.message)
 
-                if current_turn.darts == 'exit':
-                    self.over = True
-                    break
+                    if current_turn.darts == 'exit':
+                        self.over = True
+                        break
 
-                if current_turn.darts == 'undo':
-                    # restore backups
-                    self.next -= 1
-                    self.leadscore = str(self.backup_leadscore)
-                    self.totalturns = int(self.backup_totalturns)
-                    self.hole = int(self.backup_hole)
-                    self.overtime = bool(self.backup_overtime)
+                    if current_turn.darts == 'undo':
+                        # restore backups
+                        self.next -= (1+self.playernames.count('Opponent'))
+                        self.leadscore = str(self.backup_leadscore)
+                        self.totalturns = int(self.backup_totalturns)
+                        self.hole = int(self.backup_hole)
+                        self.overtime = bool(self.backup_overtime)
 
-                    for i in range(len(self.players)):
-                        self.players[i].score = int(self.players[i].backup_score)
-                    break
+                        for i in range(len(self.players)):
+                            self.players[i].score = int(self.players[i].backup_score)
+                        break
 
-                else:
-                    ## update object
-                    current_turn.darts = int(current_turn.darts)
-                    # set backups
-                    self.backup_leadscore = str(self.leadscore)
-                    self.backup_totalturns = int(self.totalturns)
-                    self.backup_hole = int(self.hole)
-                    self.backup_overtime = bool(self.overtime)
+                    else:
+                        ## update object
+                        current_turn.darts = int(current_turn.darts)
+                        # set backups
+                        self.backup_leadscore = str(self.leadscore)
+                        self.backup_totalturns = int(self.totalturns)
+                        self.backup_hole = int(self.hole)
+                        self.backup_overtime = bool(self.overtime)
 
-                    for i in range(len(self.players)):
-                        self.players[i].backup_score = int(self.players[i].score)
+                        for i in range(len(self.players)):
+                            self.players[i].backup_score = int(self.players[i].score)
 
                 self.totalturns += 1
                 if (self.totalturns%len(self.playernames) == 1):
