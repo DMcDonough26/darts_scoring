@@ -4,11 +4,10 @@ import numpy as np
 
 class TeamGame():
     # defines games that can be played
-    def __init__(self,name='1',players=['Player 1','Player 2'],gametype='1',scoreboard=[],teams=[],
+    def __init__(self,name='1',players=['Player 1','Player 2'],scoreboard=[],teams=[],
     next=0,over=False,winner='',startscore=0,training=False):
         self.name = name
         self.players = players
-        self.gametype = gametype
         self.scoreboard = scoreboard
         self.teams = teams
         self.next = next
@@ -32,16 +31,25 @@ class TeamGame():
         print('\nWelcome, ',self.players,'\n')
         random.shuffle(self.players)
 
-        if self.gametype == '1':
-            team1 = Team(players=self.players[0])
-            team2 = Team(players=self.players[1])
-            team1.displayname = team1.players
-            team2.displayname = team2.players
-        else:
-            team1 = Team(players=[self.players[0],self.players[2]])
-            team2 = Team(players=[self.players[1],self.players[3]])
-            team1.displayname = str(team1.players[0]) + ' and ' + str(team1.players[1])
-            team2.displayname = str(team2.players[0]) + ' and ' + str(team2.players[1])
+        team1list = []
+        team2list = []
+
+        for i in range(len(self.players)):
+            if i%2 == 0:
+                team1list.append(self.players[i])
+            else:
+                team2list.append(self.players[i])
+
+        team1 = Team(players=team1list)
+        team2 = Team(players=team2list)
+
+        for i in range(len(team1.players)):
+            if i == 0:
+                team1.displayname = str(team1.players[i])
+                team2.displayname = str(team2.players[i])
+            else:
+                team1.displayname = str(team1.displayname + ', ' + team1.players[i])
+                team2.displayname = str(team2.displayname + ', ' + team2.players[i])
 
         team1.space = ' ' * (len(team2.displayname)-len(team1.displayname))
         team2.space = ' ' * (len(team1.displayname)-len(team2.displayname))
@@ -76,8 +84,8 @@ class Turn():
         self.numbers= numbers
 
 class Cricket(TeamGame):
-    def __init__(self, name='1', players=['Player 1', 'Player 2'], gametype ='1', scoreboard=[], next=0, over=False,winner='', training_level='1'):
-        TeamGame.__init__(self,name,players,gametype,scoreboard,next,over,winner)
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='', training_level='1'):
+        TeamGame.__init__(self,name,players,scoreboard,next,over,winner)
         self.training_level=training_level
 
     def setup(self):
@@ -98,12 +106,8 @@ class Cricket(TeamGame):
     def scoreturn(self):
         current_turn = Turn()
 
-        if self.gametype == '1':
-            current_turn.player = self.players[self.next%2]
-            current_turn.message = self.players[self.next%2] + "- you're up!\n"
-        else:
-            current_turn.player = self.players[self.next%4]
-            current_turn.message = self.players[self.next%4] + "- you're up!\n"
+        current_turn.player = self.players[self.next%len(self.players)]
+        current_turn.message = current_turn.player + " - you're up!\n"
 
         while (True):
 
@@ -274,8 +278,8 @@ class Cricket(TeamGame):
                 print('ERROR')
 
 class Spanish(TeamGame):
-    def __init__(self, name='1', players=['Player 1', 'Player 2'], gametype ='1', scoreboard=[], next=0, over=False, winner=''):
-        TeamGame.__init__(self,name,players,gametype,scoreboard,next,over,winner)
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False, winner=''):
+        TeamGame.__init__(self,name,players,scoreboard,next,over,winner)
 
     def setup(self):
         self.maketeams()
@@ -289,10 +293,8 @@ class Spanish(TeamGame):
     def scoreturn(self):
         current_turn = Turn()
 
-        if self.gametype == '1':
-            current_turn.message = self.players[self.next%2] + " - you're up!\n"
-        else:
-            current_turn.message = self.players[self.next%4] + " - you're up!\n"
+        current_turn.player = self.players[self.next%len(self.players)]
+        current_turn.message = current_turn.player + " - you're up!\n"
 
         while (True):
             try:
@@ -392,8 +394,8 @@ class Spanish(TeamGame):
                 print('ERROR')
 
 class Minnesota(TeamGame):
-    def __init__(self, name='1', players=['Player 1', 'Player 2'], gametype ='1', scoreboard=[], next=0, over=False, winner='', extrascore=0):
-        TeamGame.__init__(self,name,players,gametype,scoreboard,next,over,winner,extrascore)
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False, winner='', extrascore=0):
+        TeamGame.__init__(self,name,players,scoreboard,next,over,winner,extrascore)
         self.extrascore = extrascore
 
     def setup(self):
@@ -408,10 +410,8 @@ class Minnesota(TeamGame):
     def scoreturn(self):
         current_turn = Turn()
 
-        if self.gametype == '1':
-            current_turn.message = self.players[self.next%2] + " - you're up!\n"
-        else:
-            current_turn.message = self.players[self.next%4] + " - you're up!\n"
+        current_turn.player = self.players[self.next%len(self.players)]
+        current_turn.message = current_turn.player + " - you're up!\n"
 
         while (True):
             try:
@@ -515,9 +515,9 @@ class Minnesota(TeamGame):
                 print('ERROR')
 
 class X01(TeamGame):
-    def __init__(self, name='1', players=['Player 1', 'Player 2'], gametype ='1', scoreboard=[], next=0, over=False,winner='',startscore=501,
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore=501,
         training_level='1'):
-        TeamGame.__init__(self,name,players,gametype,scoreboard,next,over,winner,startscore)
+        TeamGame.__init__(self,name,players,scoreboard,next,over,winner,startscore)
         self.startscore = startscore
         self.training_level = training_level
 
@@ -530,12 +530,8 @@ class X01(TeamGame):
     def scoreturn(self):
         current_turn = Turn()
 
-        if self.gametype == '1':
-            current_turn.player = self.players[self.next%2]
-            current_turn.message = self.players[self.next%2] + "- you're up!\n"
-        else:
-            current_turn.player = self.players[self.next%4]
-            current_turn.message = self.players[self.next%4] + "- you're up!\n"
+        current_turn.player = self.players[self.next%len(self.players)]
+        current_turn.message = current_turn.player + " - you're up!\n"
 
         while (True):
             try:
@@ -1412,90 +1408,126 @@ def main():
         if start_game.name == '3':
             start_game.startscore = int(input('What starting score do you want?\n'))
             #instantiate game
-            current_game = X01(name=start_game.name, players=start_game.players, gametype=start_game.gametype, startscore=start_game.startscore,
+            current_game = X01(name=start_game.name, players=start_game.players, startscore=start_game.startscore,
                 training_level=start_game.training_level)
             current_game.rungame()
 
         if start_game.name == '4':
             #instantiate game
-            current_game = Cricket(name=start_game.name, players=start_game.players, gametype=start_game.gametype, training_level=start_game.training_level)
+            current_game = Cricket(name=start_game.name, players=start_game.players, training_level=start_game.training_level)
+            current_game.rungame()
+
+    elif len(start_game.players)%2==1:
+        #odd games
+        start_game.name = input('\nWhat game would you like to play:\n\n1. Legs\n2. Follow the Leader\n3. Golf\n4. Killer\n5. Cutthroat Cricket\n6. Cutthroat\n')
+
+        # Launch legs
+        if start_game.name == '1':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many legs to start?\n'))
+            current_game = Legs(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore)
+            current_game.rungame()
+
+        # Follow the leader
+        if start_game.name == '2':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many legs to start?\n'))
+            current_game = Follow(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore)
+            current_game.rungame()
+
+        # Golf
+        if start_game.name == '3':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many holes?\n'))
+            current_game = Golf(name=start_game.name, playernames=start_game.players, holes=start_game.startscore)
+            current_game.rungame()
+
+        # Killer
+        if start_game.name == '4':
+            #instantiate game
+            current_game = Killer(name=start_game.name, playernames=start_game.players)
+            current_game.rungame()
+
+        # CutthroatCricket
+        if start_game.name == '5':
+            #instantiate game
+            current_game = CutthroatCricket(name=start_game.name, playernames=start_game.players)
+            current_game.rungame()
+
+        # Cutthroat
+        if start_game.name == '6':
+            #instantiate game
+            current_game = Cutthroat(name=start_game.name, playernames=start_game.players)
             current_game.rungame()
 
     else:
-        # Ask for singles vs doubles
-        start_game.gametype = input('\nWhat type of game:\n1. 1x1\n2. 2x2\n3. Free for All\n')
-        if (start_game.gametype == '1' or start_game.gametype == '2'):
-            start_game.name = input('\nWhat game would you like to play:\n1. Cricket\n2. Spanish\n3. Minnesota\n4. X01\n')
+        # all games
+        start_game.name = input('''\nWhat game would you like to play:\n\nIndividual Games:\n1. Legs\n2. Follow the Leader\n3. Golf\n4. Killer\n5. Cutthroat Cricket\n6. Cutthroat\n\nTeam Games:\n7. Cricket\n8. Spanish\n9. Minnesota\n10. X01\n''')
 
-            if start_game.name == '1':
-                #instantiate game
-                current_game = Cricket(name=start_game.name, players=start_game.players, gametype=start_game.gametype)
-                current_game.rungame()
+        # Launch legs
+        if start_game.name == '1':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many legs to start?\n'))
+            current_game = Legs(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore)
+            current_game.rungame()
 
-            # Launch spanish
-            if start_game.name == '2':
-                #instantiate game
-                current_game = Spanish(name=start_game.name, players=start_game.players, gametype=start_game.gametype)
-                current_game.rungame()
+        # Follow the leader
+        if start_game.name == '2':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many legs to start?\n'))
+            current_game = Follow(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore)
+            current_game.rungame()
 
-            # Launch minnesota
-            if start_game.name == '3':
-                #instantiate game
-                current_game = Minnesota(name=start_game.name, players=start_game.players, gametype=start_game.gametype)
-                current_game.rungame()
+        # Golf
+        if start_game.name == '3':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many holes?\n'))
+            current_game = Golf(name=start_game.name, playernames=start_game.players, holes=start_game.startscore)
+            current_game.rungame()
 
-            # Launch X01
-            if start_game.name == '4':
-                start_game.startscore = int(input('What starting score do you want?\n'))
-                #instantiate game
-                current_game = X01(name=start_game.name, players=start_game.players, gametype=start_game.gametype, startscore=start_game.startscore)
-                current_game.rungame()
+        # Killer
+        if start_game.name == '4':
+            #instantiate game
+            current_game = Killer(name=start_game.name, playernames=start_game.players)
+            current_game.rungame()
 
-        elif start_game.gametype == '3':
-            start_game.name = input('\nWhat game would you like to play:\n1. Legs\n2. Follow the Leader\n3. Golf\n4. Killer\n5. Cutthroat Cricket\n6. Cutthroat\n')
+        # CutthroatCricket
+        if start_game.name == '5':
+            #instantiate game
+            current_game = CutthroatCricket(name=start_game.name, playernames=start_game.players)
+            current_game.rungame()
 
-            # Launch legs
-            if start_game.name == '1':
-                #instantiate game
-                start_game.startscore = int(input('\nHow many legs to start?\n'))
-                current_game = Legs(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore)
-                current_game.rungame()
+        # Cutthroat
+        if start_game.name == '6':
+            #instantiate game
+            current_game = Cutthroat(name=start_game.name, playernames=start_game.players)
+            current_game.rungame()
 
-            # Follow the leader
-            if start_game.name == '2':
-                #instantiate game
-                start_game.startscore = int(input('\nHow many legs to start?\n'))
-                current_game = Follow(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore)
-                current_game.rungame()
+        if start_game.name == '7':
+            #instantiate game
+            current_game = Cricket(name=start_game.name, players=start_game.players)
+            current_game.rungame()
 
-            # Golf
-            if start_game.name == '3':
-                #instantiate game
-                start_game.startscore = int(input('\nHow many holes?\n'))
-                current_game = Golf(name=start_game.name, playernames=start_game.players, holes=start_game.startscore)
-                current_game.rungame()
+        # Launch spanish
+        if start_game.name == '8':
+            #instantiate game
+            current_game = Spanish(name=start_game.name, players=start_game.players)
+            current_game.rungame()
 
-            # Killer
-            if start_game.name == '4':
-                #instantiate game
-                current_game = Killer(name=start_game.name, playernames=start_game.players)
-                current_game.rungame()
+        # Launch minnesota
+        if start_game.name == '9':
+            #instantiate game
+            current_game = Minnesota(name=start_game.name, players=start_game.players)
+            current_game.rungame()
 
-            # CutthroatCricket
-            if start_game.name == '5':
-                #instantiate game
-                current_game = CutthroatCricket(name=start_game.name, playernames=start_game.players)
-                current_game.rungame()
+        # Launch X01
+        if start_game.name == '10':
+            start_game.startscore = int(input('What starting score do you want?\n'))
+            #instantiate game
+            current_game = X01(name=start_game.name, players=start_game.players, startscore=start_game.startscore)
+            current_game.rungame()
 
-            # Cutthroat
-            if start_game.name == '6':
-                #instantiate game
-                current_game = Cutthroat(name=start_game.name, playernames=start_game.players)
-                current_game.rungame()
 
-# need to have undo for cutthroat
-# add ability to bring back multiple numbers in cutthroat
 # better understand need for default parameters in constructor methods for subclasses
-# need to fix undo functionality for training mode
 
 main()
