@@ -1280,6 +1280,7 @@ class Cutthroat(SingleGame):
             self.players[i].score_dict = dict(zip(self.players[i].numbers,[self.startlegs]*numbersperplayer))
             self.players[i].backup_score_dict = dict(zip(self.players[i].numbers,[self.startlegs]*numbersperplayer))
             self.dartboard = pd.DataFrame({"Player":list(temp_dict_name.values()),"Lives":list(temp_dict_value.values())},index=list(temp_dict_name.keys()))
+            self.backup_dartboard = pd.DataFrame({"Player":list(temp_dict_name.values()),"Lives":list(temp_dict_value.values())},index=list(temp_dict_name.keys()))
 
     def scoreturn(self):
 
@@ -1312,10 +1313,15 @@ class Cutthroat(SingleGame):
                         self.over = True
                         break
 
-                    elif current_turn.darts == 'undo':
-                        pass
+                    if current_turn.darts == 'undo':
+                        self.next -= 1
+                        self.dartboard = pd.DataFrame(self.backup_dartboard)
+                        break
 
-                    elif current_turn.darts == 'miss':
+                    else:
+                        self.backup_scoreboard = pd.DataFrame(self.backup_dartboard)
+
+                    if current_turn.darts == 'miss':
                         self.next += 1
                         self.printscore()
                         break
@@ -1341,16 +1347,18 @@ class Cutthroat(SingleGame):
                                 temp_frame.loc[dartnum,'Lives'] = 0
                             if (temp_frame.loc[dartnum]['Player'] == current_turn.player.name):
                                 scratch = True
-                                scratchval = int(numberval)
+                                scratchval += int(numberval)
 
                         if scratch == True:
                             bringback = input("Scratch - which darts?\n").split(',')
 
                             for dart in bringback:
-                                dart = int(dart)
-                                temp_frame.loc[dart,'Lives'] += scratchval
-                                if temp_frame.loc[dart]['Lives'] > 3:
-                                    temp_frame.loc[dart,'Lives'] = 3
+                                letterval = dart[0]
+                                numberval = score_dict[letterval]
+                                dartnum = int(dart[1:])
+                                temp_frame.loc[dartnum,'Lives'] += numberval
+                                if temp_frame.loc[dartnum]['Lives'] > 3:
+                                    temp_frame.loc[dartnum,'Lives'] = 3
 
                         self.dartboard = temp_frame.copy()
 
