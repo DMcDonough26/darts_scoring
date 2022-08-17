@@ -17,7 +17,7 @@ The program is admittedly not super intuitive, so I've included some detailed in
 ## Cricket
 <br> -- darts are scored with a lowercase 't','d','s' and then the number scored and a comma separating darts
 <br> -- here is an example of triple 20, 19, 18 in the same turn
-<br> t19,t18,t17
+<br> t20,t19,t18
 
 <br> -- if an error is thrown the user will be reprompted to enter the darts
 <br> -- if you accidently score the wrong darts you can type "undo" and the previous turn will be restored
