@@ -6,7 +6,8 @@ During COVID, some buddies and I began playing darts over zoom. I created this p
 ** 2/1/2022 I've added a play-against-the-computer mode where you can specify the desired level of opposition for Legs, Golf, X01, and Cricket
 
 ** August 2022 - Streamlined menu, added undo functionality to training mode and cutthroat, fixed bug in multiplayers mode for games eligible for training,
-added error message for exception handling, enhanced scratch bringback functionality for cutthroat, added around the world for multiplayer and training.
+added error message for exception handling, enhanced scratch bringback functionality for cutthroat, added around the world for multiplayer and training,
+added training mode for follow the leader.
 
 ## How to use
 The program is admittedly not super intuitive, so I've included some detailed instructions on how to use
@@ -16,6 +17,7 @@ The program is admittedly not super intuitive, so I've included some detailed in
 <br> -- Player1, Player2
 <br> -- Teams are randomly assigned for games so no need to worry about input order
 <br> -- If only one player is provided, you will then be prompted to specify the level of computer opponent you wish to play
+<br> -- If you want to play against multiple computer opponents, you can add multiple players with the name "Opponent", and training mode defaults to beginner
 
 ## Cricket
 <br> -- darts are scored with a lowercase 't','d','s' and then the number scored and a comma separating darts

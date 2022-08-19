@@ -939,7 +939,7 @@ class Legs(SingleGame):
         print()
 
 class Follow(SingleGame):
-    def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner='', startlegs=5, leadscore = 'Open',leader=[]):
+    def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner='', startlegs=5, leadscore = 'Open',leader=[], training_level='1'):
         TeamGame.__init__(self,name,scoreboard,next,over,winner)
         self.playernames = playernames
         self.startlegs = startlegs
@@ -947,6 +947,7 @@ class Follow(SingleGame):
         self.totallives = startlegs * len(playernames)
         self.leader = leader
         self.next = next
+        self.training_level = training_level
 
     def setup(self):
         self.maketeams()
@@ -978,33 +979,68 @@ class Follow(SingleGame):
 
                 while (True):
                     try:
-                        current_turn.darts = input(current_turn.message)
+                        # if opponent is up sample from distribution
+                        if current_turn.player.name == 'Opponent':
+                            # defense probabilty dictionary - three dart probability of hitting t, d, s
+                            d_triple_dict = {'1':(1-(1-0.04)**3),'2':(1-(1-0.08)**3),'3':(1-(1-.15)**3),'4':(1-(1-.20)**3)}
+                            d_double_dict = {'1':(1-(1-0.04)**3),'2':(1-(1-0.08)**3),'3':(1-(1-.15)**3),'4':(1-(1-.20)**3)}
+                            d_single_dict = {'1':(1-(1-0.04)**3),'2':(1-(1-0.08)**3),'3':(1-(1-.15)**3),'4':(1-(1-.20)**3)}
 
-                        if current_turn.darts == 'exit':
-                            self.over = True
-                            break
+                            o_triple_dict = {'1':0.04,'2':0.08,'3':.15,'4':.20}
+                            o_double_dict = {'1':0.04,'2':0.08,'3':.15,'4':.20}
+                            o_single_dict = {'1':0.25,'2':0.40,'3':.55,'4':.70}
 
-                        if current_turn.darts == 'undo':
-                            ## if yes, retrive the old stuff
-                            self.next -= 1
-                            # need a backup lead score
-                            self.leadscore = str(self.backup_leadscore)
-                            # need a backup total lives
-                            self.totallives = int(self.backup_totallives)
-                            # need to backup each players legs
-                            for i in range(len(self.players)):
-                                self.players[i].lives = int(self.players[i].backup_lives)
-                            break
+                            print(self.leadscore)
+
+                            if self.leadscore != 'Open':
+                                current_turn.darts = 'miss'
+                                if self.leadscore[0] == 't':
+                                    if (np.random.binomial(1,d_triple_dict[self.training_level]) == 1):
+                                        current_turn.darts = 'hit'
+                                elif self.leadscore[0] == 'd':
+                                    if (np.random.binomial(1,d_double_dict[self.training_level]) == 1):
+                                        current_turn.darts = 'hit'
+                                elif self.leadscore[0] == 's':
+                                    if (np.random.binomial(1,d_single_dict[self.training_level]) == 1):
+                                        current_turn.darts = 'hit'
+
+                            if ((current_turn.darts == 'hit') | (self.leadscore == 'Open')):
+                                if (np.random.binomial(1,d_triple_dict[self.training_level]) == 1):
+                                        # triple with random number
+                                        current_turn.darts = 't'+str(random.randint(1,20))
+                                elif (np.random.binomial(1,d_double_dict[self.training_level]) == 1):
+                                    # double with random number
+                                    current_turn.darts = 'd'+str(random.randint(1,20))
+                                else:
+                                    # single with random number
+                                    current_turn.darts = 's'+str(random.randint(1,20))
 
                         else:
-                            ## update object
-                            current_turn.darts = current_turn.darts
+                            current_turn.darts = input(current_turn.message)
 
-                            self.backup_leadscore = str(self.leadscore)
-                            self.backup_totallives = int(self.totallives)
+                            if current_turn.darts == 'exit':
+                                self.over = True
+                                break
 
-                            for i in range(len(self.players)):
-                                self.players[i].backup_lives = int(self.players[i].lives)
+                            if current_turn.darts == 'undo':
+                                ## if yes, retrive the old stuff
+                                self.next -= (1+self.playernames.count('Opponent'))
+                                # need a backup lead score
+                                self.leadscore = str(self.backup_leadscore)
+                                # need a backup total lives
+                                self.totallives = int(self.backup_totallives)
+                                # need to backup each players legs
+                                for i in range(len(self.players)):
+                                    self.players[i].lives = int(self.players[i].backup_lives)
+                                break
+
+                            else:
+                                ## update object
+                                self.backup_leadscore = str(self.leadscore)
+                                self.backup_totallives = int(self.totallives)
+
+                                for i in range(len(self.players)):
+                                    self.players[i].backup_lives = int(self.players[i].lives)
 
                         if current_turn.darts != 'miss':
                             self.leadscore = current_turn.darts
@@ -1553,7 +1589,7 @@ def main():
         start_game.training = True
         start_game.players.append('Opponent')
         start_game.training_level = input('\nWhat level would you like to play:\n1. Beginner\n2. Intermediate\n3. Advanced\n4. Expert\n')
-        start_game.name = input('\nWhat game would you like to play:\n1. Legs\n2. Golf\n3. X01\n4. Cricket\n5. Spanish\n6. Around The World\n')
+        start_game.name = input('\nWhat game would you like to play:\n1. Legs\n2. Follow The Leader\n3. Golf\n4. X01\n5. Cricket\n6. Spanish\n7. Around The World\n')
 
         # Launch legs
         if start_game.name == '1':
@@ -1562,34 +1598,41 @@ def main():
             current_game = Legs(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore, training_level=start_game.training_level)
             current_game.rungame()
 
-        # Golf
+        # Follow the leader
         if start_game.name == '2':
+            #instantiate game
+            start_game.startscore = int(input('\nHow many legs to start?\n'))
+            current_game = Follow(name=start_game.name, playernames=start_game.players, startlegs=start_game.startscore, training_level=start_game.training_level)
+            current_game.rungame()
+
+        # Golf
+        if start_game.name == '3':
             #instantiate game
             start_game.startscore = int(input('\nHow many holes?\n'))
             current_game = Golf(name=start_game.name, playernames=start_game.players, holes=start_game.startscore, training_level=start_game.training_level)
             current_game.rungame()
 
         # Launch X01
-        if start_game.name == '3':
+        if start_game.name == '4':
             start_game.startscore = int(input('What starting score do you want?\n'))
             #instantiate game
             current_game = X01(name=start_game.name, players=start_game.players, startscore=start_game.startscore,
                 training_level=start_game.training_level)
             current_game.rungame()
 
-        if start_game.name == '4':
+        if start_game.name == '5':
             #instantiate game
             current_game = Cricket(name=start_game.name, players=start_game.players, training_level=start_game.training_level)
             current_game.rungame()
 
         # Launch spanish
-        if start_game.name == '5':
+        if start_game.name == '6':
             #instantiate game
             current_game = Spanish(name=start_game.name, players=start_game.players, training_level=start_game.training_level)
             current_game.rungame()
 
         # Launch ATW
-        if start_game.name == '6':
+        if start_game.name == '7':
             #instantiate game
             current_game = ATW(name=start_game.name, players=start_game.players, training_level=start_game.training_level)
             current_game.rungame()
