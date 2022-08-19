@@ -43,7 +43,7 @@ The program is admittedly not super intuitive, so I've included some detailed in
 ## Around The World
 
 <br> -- played starting at 20 working down to 1, singles advance one number, doubles two, triples three
-<br> -- after hitting 1, you must hit three bullseyes to winner
+<br> -- after hitting 1, you must hit three bullseyes to win
 <br> -- played with continuation, where if the final dart in a turn hits, that player's teammate immediately follows to continue the turn
 <br> -- also played with redemption, where once a team hits three bulls, the other team has one more turn to try to match
 <br> -- for scoring, simply enter the last number you've hit, and for bulls enter the number of bulls as capital Bs (e.g. B, BB, BBB)
