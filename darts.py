@@ -169,7 +169,7 @@ class Cricket(TeamGame):
                             pass
                         mean_dict = {'1':0.5,'2':1,'3':1.5,'4':2}
                         sd_dict = {'1':0.25,'2':0.5,'3':0.5,'4':1}
-                        value = min(max(round(np.random.normal(0.5,0.25)),0),3)
+                        value = min(max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0),3)
                         score_dict = dict(zip([3,2,1],['t','d','s']))
                         if value == 0:
                             pass
@@ -611,6 +611,102 @@ class X01(TeamGame):
                 self.printscore()
 
                 if (current_turn.team.score == 0):
+                    self.over = True
+                    self.winner = current_turn.team.displayname
+                break
+            except:
+                print('ERROR')
+
+    def printscore(self):
+        team1 = self.teams[0]
+        team2 = self.teams[1]
+        print(team1.displayname+":",team1.space,team1.score)
+        print(team2.displayname+":",team2.space,team2.score,'\n')
+
+class ATW(TeamGame):
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore='20',training_level='1'):
+        TeamGame.__init__(self,name,players,scoreboard,next,over,winner,startscore)
+        self.startscore = startscore
+        self.training_level = training_level
+
+    def setup(self):
+        self.maketeams()
+
+        self.teams[0].score = self.startscore
+        self.teams[1].score = self.startscore
+
+    def scoreturn(self):
+        current_turn = Turn()
+
+        current_turn.player = self.players[self.next%len(self.players)]
+        current_turn.message = current_turn.player + " - you're up!\n"
+
+        while (True):
+            try:
+                # establish roles
+                if (self.next%2 == 0):
+                    current_turn.team = self.teams[0]
+                    current_turn.opponent = self.teams[1]
+                else:
+                    current_turn.team = self.teams[1]
+                    current_turn.opponent = self.teams[0]
+
+                # if opponent is up sample from distribution
+                if current_turn.player == 'Opponent':
+                    # simulate turn value from distribution
+                    mean_dict = {'1':0.5,'2':1,'3':1.5,'4':2}
+                    sd_dict = {'1':0.25,'2':0.5,'3':0.5,'4':1}
+                    value = max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0)
+                    bull_dict1 = {'B':0,'BB':-1,'BBB':-2}
+                    bull_dict2 = {0:'B',-1:'BB',-2:'BBB'}
+                    if current_turn.team.score in bull_dict1.keys():
+                        current_turn.team.score = bull_dict1[current_turn.team.score]
+                        current_turn.darts = bull_dict2[max(current_turn.team.score - value, -2)]
+
+                    else:
+                        current_turn.darts = max(int(current_turn.team.score) - value,-2)
+                        if current_turn.darts <= 0:
+                                current_turn.darts = bull_dict2[current_turn.darts]
+
+                # otherwise proceed
+                else:
+                    current_turn.darts = input(current_turn.message)
+
+                    if current_turn.darts == 'exit':
+                        self.over = True
+                        break
+
+                    ## this is where you can check to see if the user said "undo"
+                    if current_turn.darts == 'undo':
+                        ## if yes, retrive the old stuff
+
+                        self.next -= (1+self.players.count('Opponent'))
+                        self.teams[0].score = str(self.teams[0].backup_score)
+                        self.teams[1].score = str(self.teams[1].backup_score)
+                        break
+
+                    else:
+                        ## update object
+                        self.teams[0].backup_score = str(self.teams[0].score)
+                        self.teams[1].backup_score = str(self.teams[1].score)
+
+                # add current to existing
+                current_turn.team.score = str(current_turn.darts)
+
+                # update teams
+                if (self.next%2 == 0):
+                    self.teams[0] = current_turn.team
+                    self.teams[1] = current_turn.opponent
+                else:
+                    self.teams[1] = current_turn.team
+                    self.teams[0] = current_turn.opponent
+
+                self.next += 1
+
+                print()
+                self.printscore()
+
+                if (current_turn.team.score == 'BBB'):
                     self.over = True
                     self.winner = current_turn.team.displayname
                 break
@@ -1388,7 +1484,7 @@ def main():
         start_game.training = True
         start_game.players.append('Opponent')
         start_game.training_level = input('\nWhat level would you like to play:\n1. Beginner\n2. Intermediate\n3. Advanced\n4. Expert\n')
-        start_game.name = input('\nWhat game would you like to play:\n1. Legs\n2. Golf\n3. X01\n4. Cricket\n')
+        start_game.name = input('\nWhat game would you like to play:\n1. Legs\n2. Golf\n3. X01\n4. Cricket\n5. Around The World\n')
 
         # Launch legs
         if start_game.name == '1':
@@ -1415,6 +1511,12 @@ def main():
         if start_game.name == '4':
             #instantiate game
             current_game = Cricket(name=start_game.name, players=start_game.players, training_level=start_game.training_level)
+            current_game.rungame()
+
+        # Launch ATW
+        if start_game.name == '5':
+            #instantiate game
+            current_game = ATW(name=start_game.name, players=start_game.players, training_level=start_game.training_level)
             current_game.rungame()
 
     elif len(start_game.players)%2==1:
@@ -1462,7 +1564,7 @@ def main():
 
     else:
         # all games
-        start_game.name = input('''\nWhat game would you like to play:\n\nIndividual Games:\n1. Legs\n2. Follow the Leader\n3. Golf\n4. Killer\n5. Cutthroat Cricket\n6. Cutthroat\n\nTeam Games:\n7. Cricket\n8. Spanish\n9. Minnesota\n10. X01\n''')
+        start_game.name = input('''\nWhat game would you like to play:\n\nIndividual Games:\n1.  Legs\n2.  Follow the Leader\n3.  Golf\n4.  Killer\n5.  Cutthroat Cricket\n6.  Cutthroat\n\nTeam Games:\n7.  Cricket\n8.  Spanish\n9.  Minnesota\n10. X01\n11. Around The World\n''')
 
         # Launch legs
         if start_game.name == '1':
@@ -1527,7 +1629,13 @@ def main():
             current_game = X01(name=start_game.name, players=start_game.players, startscore=start_game.startscore)
             current_game.rungame()
 
+        # Launch ATW
+        if start_game.name == '11':
+            #instantiate game
+            current_game = ATW(name=start_game.name, players=start_game.players)
+            current_game.rungame()
 
 # better understand need for default parameters in constructor methods for subclasses
+# there may be some unintentional memory assignments that are not causing problems
 
 main()
