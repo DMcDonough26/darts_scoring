@@ -6,8 +6,7 @@ During COVID, some buddies and I began playing darts over zoom. I created this p
 ** 2/1/2022 I've added a play-against-the-computer mode where you can specify the desired level of opposition for Legs, Golf, X01, and Cricket
 
 ** August 2022 - Streamlined menu, added undo functionality to training mode and cutthroat, fixed bug in multiplayers mode for games eligible for training,
-added error message for exception handling, enhanced scratch bringback functionality for cutthroat, added around the world for multiplayer and training,
-added training mode for follow the leader.
+added error message for exception handling, enhanced scratch bringback functionality for cutthroat, added around the world for multiplayer and training, added training mode for follow the leader, added ability to save training history.
 
 ## How to use
 The program is admittedly not super intuitive, so I've included some detailed instructions on how to use
