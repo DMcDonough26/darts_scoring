@@ -63,6 +63,24 @@ class TeamGame():
         while self.over != True:
             self.scoreturn()
         print('Congrats! -',self.winner)
+        if ((self.training_level != '0') & (self.winner != '')):
+            # print summary
+            self.output()
+
+            # write to csv
+            if len(self.history) == 0:
+                pd.DataFrame(dict(zip(self.history.columns,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
+                    (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)]).to_csv('history.csv', index=False)
+            else:
+                pd.concat([self.history,pd.DataFrame(dict(zip(self.history.columns,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
+                    (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)])]).to_csv('history.csv', index=False)
+
+    def output(self):
+        pass
 
 class Team():
     # define teams
@@ -87,7 +105,10 @@ class Turn():
 class Cricket(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='', training_level='1'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner)
-        self.training_level=training_level
+        self.training_level = training_level
+        self.training_player = str(players[0])
+        self.game_name = 'Cricket'
+        self.winner = winner
 
     def setup(self):
         self.maketeams()
@@ -103,6 +124,25 @@ class Cricket(TeamGame):
 
         self.backup_scoreboard = pd.DataFrame({'Team 1':self.teams[0].numbers,'Team 2':self.teams[1].numbers},index=['20','19','18','17','16','15','Bull'])
         self.backup_scoreboard.columns = [self.teams[0].displayname,self.teams[1].displayname]
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
+                    agg({'Total Score':'sum','Total Turns':'sum'})
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                print(temp2,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+        self.total_score = 0
+        self.total_turns = 0
+        self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -213,6 +253,9 @@ class Cricket(TeamGame):
                         self.teams[0].backup_numbers = list(self.teams[0].numbers)
                         self.teams[1].backup_numbers = list(self.teams[1].numbers)
 
+                    if self.training_level != '0':
+                        self.total_turns += 1
+
                 if current_turn.darts == 'miss':
                     self.next += 1
                     self.printscore()
@@ -237,6 +280,9 @@ class Cricket(TeamGame):
                         numberval = score_dict[letterval]
                         dartnum = current_turn.darts[i][1:]
                         current_turn.number_dict[dartnum] += numberval
+
+                        if ((self.training_level != '0') & (current_turn.player != 'Opponent')):
+                            self.total_score += numberval
 
                     current_turn.numbers = list(current_turn.number_dict.values())
 
@@ -278,10 +324,16 @@ class Cricket(TeamGame):
             except:
                 print('ERROR')
 
+    def output(self):
+        print("Average Score: ",int(self.total_score/self.total_turns))
+
 class Spanish(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False, winner='',training_level='1'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner)
         self.training_level = training_level
+        self.training_player = str(players[0])
+        self.game_name = 'Cricket'
+        self.winner = winner
 
     def setup(self):
         self.maketeams()
@@ -291,6 +343,25 @@ class Spanish(TeamGame):
 
         self.scoreboard = pd.DataFrame({'Team 1':self.teams[0].numbers,'Team 2':self.teams[1].numbers},index=['20','19','18','17','16','15','14','13','12','11','10'])
         self.scoreboard.columns = [self.teams[0].displayname,self.teams[1].displayname]
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
+                    agg({'Total Score':'sum','Total Turns':'sum'})
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                print(temp2,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+        self.total_score = 0
+        self.total_turns = 0
+        self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -392,6 +463,9 @@ class Spanish(TeamGame):
                         self.teams[0].backup_numbers = list(self.teams[0].numbers)
                         self.teams[1].backup_numbers = list(self.teams[1].numbers)
 
+                    if self.training_level != '0':
+                        self.total_turns += 1
+
                 if current_turn.darts == 'miss':
                     self.next += 1
                     self.printscore()
@@ -416,6 +490,9 @@ class Spanish(TeamGame):
                         numberval = score_dict[letterval]
                         dartnum = current_turn.darts[i][1:]
                         current_turn.number_dict[dartnum] += numberval
+
+                        if ((self.training_level != '0') & (current_turn.player != 'Opponent')):
+                            self.total_score += numberval
 
                     current_turn.numbers = list(current_turn.number_dict.values())
 
@@ -462,6 +539,9 @@ class Spanish(TeamGame):
                     break
             except:
                 print('ERROR')
+
+    def output(self):
+        print("Average Score: ",int(self.total_score/self.total_turns))
 
 class Minnesota(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False, winner='', extrascore=0):
@@ -586,16 +666,40 @@ class Minnesota(TeamGame):
 
 class X01(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore=501,
-        training_level='1'):
+        training_level='0'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner,startscore)
         self.startscore = startscore
         self.training_level = training_level
+        self.training_player = str(players[0])
+        self.game_name = int(startscore)
+        self.winner = winner
 
     def setup(self):
+
         self.maketeams()
 
         self.teams[0].score = self.startscore
         self.teams[1].score = self.startscore
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
+                    agg({'Total Score':'sum','Total Turns':'sum','Darts at Double':'sum','Win':'sum'})
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                temp2['Double Rate'] = (temp2['Win']/temp2['Darts at Double']).round(2)
+                print(temp2,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+            self.total_score = 0
+            self.total_turns = 0
+            self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -664,6 +768,12 @@ class X01(TeamGame):
                         self.teams[0].backup_score = int(self.teams[0].score)
                         self.teams[1].backup_score = int(self.teams[1].score)
 
+                    if self.training_level != '0':
+                        self.total_score += int(current_turn.darts)
+                        self.total_turns += 1
+                        if self.total_score <= 170:
+                            self.double_darts += int(input('How many darts at double?\n'))
+
                 # add current to existing
                 current_turn.team.score -= current_turn.darts
 
@@ -693,17 +803,43 @@ class X01(TeamGame):
         print(team1.displayname+":",team1.space,team1.score)
         print(team2.displayname+":",team2.space,team2.score,'\n')
 
+    def output(self):
+        print("Average Score: ",int(self.total_score/self.total_turns))
+        print("Double Rate: ",round((self.training_player == self.winner)*1/self.double_darts,2)*100,'%')
+
 class ATW(TeamGame):
-    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore='20',training_level='1'):
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore='20',training_level='0'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner,startscore)
         self.startscore = startscore
         self.training_level = training_level
+        self.training_player = str(players[0])
+        self.game_name = 'Around The World'
+        self.winner = winner
 
     def setup(self):
         self.maketeams()
 
         self.teams[0].score = self.startscore
         self.teams[1].score = self.startscore
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
+                    agg({'Total Score':'sum','Total Turns':'sum','Darts at Double':'sum','Win':'sum'})
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                print(temp2,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+            self.total_score = 0
+            self.total_turns = 0
+            self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -760,6 +896,20 @@ class ATW(TeamGame):
                         self.teams[0].backup_score = str(self.teams[0].score)
                         self.teams[1].backup_score = str(self.teams[1].score)
 
+                    if self.training_level != '0':
+                        # calculate turn delta
+                        bull_dict1 = {'B':0,'BB':-1,'BBB':-2}
+                        if current_turn.team.score in bull_dict1.keys():
+                            tempval1 = bull_dict1[current_turn.team.score]
+                        else:
+                            tempval1 = int(current_turn.team.score)
+                        if current_turn.darts in bull_dict1.keys():
+                            tempval2 = bull_dict1[current_turn.darts]
+                        else:
+                            tempval2 = int(current_turn.darts)
+                        self.total_score += (tempval1 - tempval2)
+                        self.total_turns += 1
+
                 # add current to existing
                 current_turn.team.score = str(current_turn.darts)
 
@@ -788,6 +938,9 @@ class ATW(TeamGame):
         team2 = self.teams[1]
         print(team1.displayname+":",team1.space,team1.score)
         print(team2.displayname+":",team2.space,team2.score,'\n')
+
+    def output(self):
+        print("Average Score: ",int(self.total_score/self.total_turns))
 
 class SingleGame():
     # defines games that can be played
@@ -831,23 +984,24 @@ class SingleGame():
         while self.over != True:
             self.scoreturn()
         print('Congrats! -',self.winner)
-        if self.training_level != '0':
+        if ((self.training_level != '0') & (self.winner != '')):
             # print summary
-            print("Average Score: ",int(self.total_score/self.total_turns))
+            self.output()
 
             # write to csv
-            if len(self.history == 0):
+            if len(self.history) == 0:
                 pd.DataFrame(dict(zip(self.history.columns,
-                    [self.training_player,dt.date.today(),'Legs',self.training_level,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
                     (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
-                    self.total_score,self.total_turns])),index=[len(self.history.index)+1]).to_csv('history.csv')
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)]).to_csv('history.csv', index=False)
             else:
                 pd.concat([self.history,pd.DataFrame(dict(zip(self.history.columns,
-                    [self.training_player,dt.date.today(),'Legs',self.training_level,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
                     (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
-                    self.total_score,self.total_turns])),index=[len(self.history.index)+1])]).to_csv('history.csv')
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)])]).to_csv('history.csv', index=False)
 
-
+    def output(self):
+        pass
 
 class Player():
     # define teams
@@ -869,6 +1023,7 @@ class Legs(SingleGame):
         self.backup_totallives = []
         self.training_level = training_level
         self.training_player = str(playernames[0])
+        self.game_name = 'Legs'
 
     def setup(self):
 
@@ -884,7 +1039,7 @@ class Legs(SingleGame):
                 temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
                 print(temp1,'\n\n')
 
-                temp2 = self.history[self.history['Game']=='Legs'].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
                 temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
                 print(temp2,'\n\n')
 
@@ -893,6 +1048,7 @@ class Legs(SingleGame):
 
             self.total_score = 0
             self.total_turns = 0
+            self.double_darts = 0
 
 
     def scoreturn(self):
@@ -980,8 +1136,11 @@ class Legs(SingleGame):
             print(self.players[i].name+":",self.players[i].space,self.players[i].lives)
         print()
 
+    def output(self):
+        print("Average Score: ",int(self.total_score/self.total_turns))
+
 class Follow(SingleGame):
-    def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner='', startlegs=5, leadscore = 'Open',leader=[], training_level='1'):
+    def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner='', startlegs=5, leadscore = 'Open',leader=[], training_level='0'):
         TeamGame.__init__(self,name,scoreboard,next,over,winner)
         self.playernames = playernames
         self.startlegs = startlegs
@@ -990,12 +1149,28 @@ class Follow(SingleGame):
         self.leader = leader
         self.next = next
         self.training_level = training_level
+        self.training_player = str(playernames[0])
+        self.game_name = 'Follow The Leader'
 
     def setup(self):
         self.maketeams()
 
         for i in range(len(self.players)):
             self.players[i].lives = self.startlegs
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+            self.total_score = 0
+            self.total_turns = 0
+            self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -1106,7 +1281,7 @@ class Follow(SingleGame):
         print()
 
 class Golf(SingleGame):
-    def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner='', holes=18, leadscore = 'Open',leader=[], hole=1, training_level=1):
+    def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner='', holes=18, leadscore = 'Open',leader=[], hole=1, training_level='0'):
         TeamGame.__init__(self,name,scoreboard,next,over,winner)
         self.playernames = playernames
         self.leadscore = leadscore
@@ -1117,9 +1292,29 @@ class Golf(SingleGame):
         self.overtime = False
         self.holes = holes
         self.training_level = training_level
+        self.training_player = str(playernames[0])
+        self.game_name = 'Golf'
 
     def setup(self):
         self.maketeams()
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+                temp2 = self.history[self.history['Game']=='Legs'].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                print(temp2,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+            self.total_score = 0
+            self.total_turns = 0
+            self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -1169,6 +1364,10 @@ class Golf(SingleGame):
                         for i in range(len(self.players)):
                             self.players[i].backup_score = int(self.players[i].score)
 
+                        if self.training_level != '0':
+                            self.total_score += int(current_turn.darts)
+                            self.total_turns += 1
+
                 self.totalturns += 1
                 if (self.totalturns%len(self.playernames) == 1):
                     self.hole += 1
@@ -1204,6 +1403,9 @@ class Golf(SingleGame):
         for i in range(len(self.players)):
             print(self.players[i].name+":",self.players[i].space,self.players[i].score)
         print()
+
+    def output(self):
+        print("Average Score: ",int(self.total_score/self.total_turns))
 
 class Killer(SingleGame):
     def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner=''):
