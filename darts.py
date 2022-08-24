@@ -134,7 +134,7 @@ class Cricket(TeamGame):
 
                 temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
                     agg({'Total Score':'sum','Total Turns':'sum'})
-                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(1)
                 print(temp2,'\n\n')
 
             except:
@@ -325,14 +325,14 @@ class Cricket(TeamGame):
                 print('ERROR')
 
     def output(self):
-        print("Average Score: ",int(self.total_score/self.total_turns))
+        print("Average Score: ",round(self.total_score/self.total_turns,1))
 
 class Spanish(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False, winner='',training_level='1'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner)
         self.training_level = training_level
         self.training_player = str(players[0])
-        self.game_name = 'Cricket'
+        self.game_name = 'Spanish'
         self.winner = winner
 
     def setup(self):
@@ -541,7 +541,7 @@ class Spanish(TeamGame):
                 print('ERROR')
 
     def output(self):
-        print("Average Score: ",int(self.total_score/self.total_turns))
+        print("Average Score: ",round(self.total_score/self.total_turns,1))
 
 class Minnesota(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False, winner='', extrascore=0):
@@ -771,7 +771,7 @@ class X01(TeamGame):
                     if self.training_level != '0':
                         self.total_score += int(current_turn.darts)
                         self.total_turns += 1
-                        if self.total_score <= 170:
+                        if current_turn.team.score <= 170:
                             self.double_darts += int(input('How many darts at double?\n'))
 
                 # add current to existing
@@ -940,7 +940,7 @@ class ATW(TeamGame):
         print(team2.displayname+":",team2.space,team2.score,'\n')
 
     def output(self):
-        print("Average Score: ",int(self.total_score/self.total_turns))
+        print("Average Score: ",round(self.total_score/self.total_turns,2))
 
 class SingleGame():
     # defines games that can be played
@@ -1305,7 +1305,7 @@ class Golf(SingleGame):
                 temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
                 print(temp1,'\n\n')
 
-                temp2 = self.history[self.history['Game']=='Legs'].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
                 temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
                 print(temp2,'\n\n')
 
