@@ -6,7 +6,10 @@ from game_mechanics import TeamGame, Turn
 class Cricket(TeamGame):
     def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='', training_level='1'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner)
-        self.training_level=training_level
+        self.training_level = training_level
+        self.training_player = str(players[0])
+        self.game_name = 'Cricket'
+        self.winner = winner
 
     def setup(self):
         self.maketeams()
@@ -22,6 +25,25 @@ class Cricket(TeamGame):
 
         self.backup_scoreboard = pd.DataFrame({'Team 1':self.teams[0].numbers,'Team 2':self.teams[1].numbers},index=['20','19','18','17','16','15','Bull'])
         self.backup_scoreboard.columns = [self.teams[0].displayname,self.teams[1].displayname]
+
+        if self.training_level != '0':
+            self.history = pd.read_csv('history.csv')
+            try:
+                temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
+                temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                print(temp1,'\n\n')
+
+                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
+                    agg({'Total Score':'sum','Total Turns':'sum'})
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(1)
+                print(temp2,'\n\n')
+
+            except:
+                print("Good luck on your first game!\n")
+
+        self.total_score = 0
+        self.total_turns = 0
+        self.double_darts = 0
 
     def scoreturn(self):
         current_turn = Turn()
@@ -89,7 +111,7 @@ class Cricket(TeamGame):
                             pass
                         mean_dict = {'1':0.5,'2':1,'3':1.5,'4':2}
                         sd_dict = {'1':0.25,'2':0.5,'3':0.5,'4':1}
-                        value = min(max(round(np.random.normal(0.5,0.25)),0),3)
+                        value = min(max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0),3)
                         score_dict = dict(zip([3,2,1],['t','d','s']))
                         if value == 0:
                             pass
@@ -132,6 +154,9 @@ class Cricket(TeamGame):
                         self.teams[0].backup_numbers = list(self.teams[0].numbers)
                         self.teams[1].backup_numbers = list(self.teams[1].numbers)
 
+                    if self.training_level != '0':
+                        self.total_turns += 1
+
                 if current_turn.darts == 'miss':
                     self.next += 1
                     self.printscore()
@@ -156,6 +181,9 @@ class Cricket(TeamGame):
                         numberval = score_dict[letterval]
                         dartnum = current_turn.darts[i][1:]
                         current_turn.number_dict[dartnum] += numberval
+
+                        if ((self.training_level != '0') & (current_turn.player != 'Opponent')):
+                            self.total_score += numberval
 
                     current_turn.numbers = list(current_turn.number_dict.values())
 
@@ -188,7 +216,7 @@ class Cricket(TeamGame):
 
                     self.printscore()
 
-                    if ((current_turn.team.score > current_turn.opponent.score) and (min(current_turn.team.numbers) == 3)):
+                    if ((current_turn.team.score >= current_turn.opponent.score) and (min(current_turn.team.numbers) == 3)):
                         self.over = True
                         self.winner = current_turn.team.displayname
 
@@ -196,3 +224,6 @@ class Cricket(TeamGame):
 
             except:
                 print('ERROR')
+
+    def output(self):
+        print("Average Score: ",round(self.total_score/self.total_turns,1))

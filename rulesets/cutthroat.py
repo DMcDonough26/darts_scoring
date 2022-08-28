@@ -138,3 +138,4 @@ class Cutthroat(SingleGame):
                 score = temp_df[temp_df['Player']==player]['Lives'].sum()
                 print(player,'\t',score)
         print()
+    

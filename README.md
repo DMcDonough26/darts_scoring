@@ -5,8 +5,8 @@ During COVID, some buddies and I began playing darts over zoom. I created this p
 
 ** 2/1/2022 I've added a play-against-the-computer mode where you can specify the desired level of opposition for Legs, Golf, X01, and Cricket
 
-** August 2022 - Streamlined menu, added undo functionality to training mode and cutthroat, fixed bug in multiple mode for games eligible for training,
-added error message or exception handling, enhanced scratch bringback functionality for cutthroat.
+** August 2022 - Streamlined menu, added undo functionality to training mode and cutthroat, fixed bug in multiplayers mode for games eligible for training,
+added error message for exception handling, enhanced scratch bringback functionality for cutthroat, added around the world for multiplayer and training, added training mode for follow the leader, added ability to save training history.
 
 ## How to use
 The program is admittedly not super intuitive, so I've included some detailed instructions on how to use
@@ -16,6 +16,7 @@ The program is admittedly not super intuitive, so I've included some detailed in
 <br> -- Player1, Player2
 <br> -- Teams are randomly assigned for games so no need to worry about input order
 <br> -- If only one player is provided, you will then be prompted to specify the level of computer opponent you wish to play
+<br> -- If you want to play against multiple computer opponents, you can add multiple players with the name "Opponent", and training mode defaults to beginner
 
 ## Cricket
 <br> -- darts are scored with a lowercase 't','d','s' and then the number scored and a comma separating darts
@@ -39,6 +40,14 @@ The program is admittedly not super intuitive, so I've included some detailed in
 
 ## X01
 <br> -- simply enter the number of points scored on that turn
+
+## Around The World
+
+<br> -- played starting at 20 working down to 1, singles advance one number, doubles two, triples three
+<br> -- after hitting 1, you must hit three bullseyes to win
+<br> -- played with continuation, where if the final dart in a turn hits, that player's teammate immediately follows to continue the turn
+<br> -- also played with redemption, where once a team hits three bulls, the other team has one more turn to try to match
+<br> -- for scoring, simply enter the last number you've hit, and for bulls enter the number of bulls as capital Bs (e.g. B, BB, BBB)
 
 ## Legs
 <br> -- simply enter the number of points scored on that turn

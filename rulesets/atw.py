@@ -3,18 +3,16 @@ import pandas as pd
 
 from game_mechanics import TeamGame, Turn
 
-class X01(TeamGame):
-    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore=501,
-        training_level='0'):
+class ATW(TeamGame):
+    def __init__(self, name='1', players=['Player 1', 'Player 2'], scoreboard=[], next=0, over=False,winner='',startscore='20',training_level='0'):
         TeamGame.__init__(self,name,players,scoreboard,next,over,winner,startscore)
         self.startscore = startscore
         self.training_level = training_level
         self.training_player = str(players[0])
-        self.game_name = int(startscore)
+        self.game_name = 'Around The World'
         self.winner = winner
 
     def setup(self):
-
         self.maketeams()
 
         self.teams[0].score = self.startscore
@@ -30,7 +28,6 @@ class X01(TeamGame):
                 temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
                     agg({'Total Score':'sum','Total Turns':'sum','Darts at Double':'sum','Win':'sum'})
                 temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
-                temp2['Double Rate'] = (temp2['Win']/temp2['Darts at Double']).round(2)
                 print(temp2,'\n\n')
 
             except:
@@ -58,35 +55,24 @@ class X01(TeamGame):
 
                 # if opponent is up sample from distribution
                 if current_turn.player == 'Opponent':
-                    score = int(current_turn.team.score)
-                    darts = 0
-                    singledart = 0
-                    for i in range(3):
-                        if score > 40:
-                            mean_dict = {'1':35,'2':40,'3':45,'4':50}
-                            sd_dict = {'1':5,'2':10,'3':10,'4':15}
-                            singledart = round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])/3)
-                            score = max(score-singledart, 2)
-                            darts += int(singledart)
-                            continue
-                        elif ((score <= 40)&(score%2!=0)):
-                            score -= 1
-                            darts += 1
-                            continue
-                        elif ((score <= 40)&(score%2==0)):
-                            double_dict = {'1':0.05,'2':0.1,'3':.17,'4':.25}
-                            if (np.random.binomial(1,double_dict[self.training_level]) == 1):
-                                darts = int(score)
-                                break
+                    # simulate turn value from distribution
+                    mean_dict = {'1':0.5,'2':1,'3':1.5,'4':2}
+                    sd_dict = {'1':0.25,'2':0.5,'3':0.5,'4':1}
+                    value = max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0)
+                    bull_dict1 = {'B':0,'BB':-1,'BBB':-2}
+                    bull_dict2 = {0:'B',-1:'BB',-2:'BBB'}
+                    if current_turn.team.score in bull_dict1.keys():
+                        current_turn.team.score = bull_dict1[current_turn.team.score]
+                        current_turn.darts = bull_dict2[max(current_turn.team.score - value, -2)]
 
-                    current_turn.darts = int(darts)
-                    print('Opponent scored',current_turn.darts)
-                    # pass
+                    else:
+                        current_turn.darts = max(int(current_turn.team.score) - value,-2)
+                        if current_turn.darts <= 0:
+                                current_turn.darts = bull_dict2[current_turn.darts]
 
                 # otherwise proceed
                 else:
                     current_turn.darts = input(current_turn.message)
-                # current_turn.darts = input(current_turn.message)
 
                     if current_turn.darts == 'exit':
                         self.over = True
@@ -97,24 +83,31 @@ class X01(TeamGame):
                         ## if yes, retrive the old stuff
 
                         self.next -= (1+self.players.count('Opponent'))
-                        self.teams[0].score = int(self.teams[0].backup_score)
-                        self.teams[1].score = int(self.teams[1].backup_score)
+                        self.teams[0].score = str(self.teams[0].backup_score)
+                        self.teams[1].score = str(self.teams[1].backup_score)
                         break
 
                     else:
                         ## update object
-                        current_turn.darts = int(current_turn.darts)
-                        self.teams[0].backup_score = int(self.teams[0].score)
-                        self.teams[1].backup_score = int(self.teams[1].score)
+                        self.teams[0].backup_score = str(self.teams[0].score)
+                        self.teams[1].backup_score = str(self.teams[1].score)
 
                     if self.training_level != '0':
-                        self.total_score += int(current_turn.darts)
+                        # calculate turn delta
+                        bull_dict1 = {'B':0,'BB':-1,'BBB':-2}
+                        if current_turn.team.score in bull_dict1.keys():
+                            tempval1 = bull_dict1[current_turn.team.score]
+                        else:
+                            tempval1 = int(current_turn.team.score)
+                        if current_turn.darts in bull_dict1.keys():
+                            tempval2 = bull_dict1[current_turn.darts]
+                        else:
+                            tempval2 = int(current_turn.darts)
+                        self.total_score += (tempval1 - tempval2)
                         self.total_turns += 1
-                        if current_turn.team.score <= 170:
-                            self.double_darts += int(input('How many darts at double?\n'))
 
                 # add current to existing
-                current_turn.team.score -= current_turn.darts
+                current_turn.team.score = str(current_turn.darts)
 
                 # update teams
                 if (self.next%2 == 0):
@@ -129,7 +122,7 @@ class X01(TeamGame):
                 print()
                 self.printscore()
 
-                if (current_turn.team.score == 0):
+                if (current_turn.team.score == 'BBB'):
                     self.over = True
                     self.winner = current_turn.team.displayname
                 break
@@ -143,5 +136,4 @@ class X01(TeamGame):
         print(team2.displayname+":",team2.space,team2.score,'\n')
 
     def output(self):
-        print("Average Score: ",int(self.total_score/self.total_turns))
-        print("Double Rate: ",round((self.training_player == self.winner)*1/self.double_darts,2)*100,'%')
+        print("Average Score: ",round(self.total_score/self.total_turns,2))

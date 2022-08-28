@@ -2,7 +2,6 @@ import pandas as pd
 
 from game_mechanics import SingleGame, TeamGame, Turn
 
-
 class CutthroatCricket(SingleGame):
     def __init__(self, name='1', playernames=[], scoreboard=[], next=0, over=False,winner=''):
         TeamGame.__init__(self,name,scoreboard,next,over,winner)

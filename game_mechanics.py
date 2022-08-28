@@ -1,5 +1,8 @@
 import random
 
+import pandas as pd
+import datetime as dt
+
 class TeamGame():
     # defines games that can be played
     def __init__(self,name='1',players=['Player 1','Player 2'],scoreboard=[],teams=[],
@@ -60,6 +63,45 @@ class TeamGame():
         while self.over != True:
             self.scoreturn()
         print('Congrats! -',self.winner)
+        if ((self.training_level != '0') & (self.winner != '')):
+            # print summary
+            self.output()
+
+            # write to csv
+            if len(self.history) == 0:
+                pd.DataFrame(dict(zip(self.history.columns,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
+                    (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)]).to_csv('history.csv', index=False)
+            else:
+                pd.concat([self.history,pd.DataFrame(dict(zip(self.history.columns,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
+                    (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)])]).to_csv('history.csv', index=False)
+
+    def output(self):
+        pass
+
+class Team():
+    # define teams
+    def __init__(self,players,score=0, space=0, displayname=''):
+        self.players = players
+        self.score = score
+        self.space = space
+        self.displayname = displayname
+        self.backup_score = 0
+
+class Turn():
+    # define turns
+    def __init__(self,team='Team 1',player = 'Player 1',message ='',darts=[],number_dict={},opponent=[],numbers=[]):
+        self.team = team
+        self.player = player
+        self.message = message
+        self.darts = darts
+        self.number_dict= number_dict
+        self.opponent = opponent
+        self.numbers= numbers
+
 
 class SingleGame():
     # defines games that can be played
@@ -103,26 +145,24 @@ class SingleGame():
         while self.over != True:
             self.scoreturn()
         print('Congrats! -',self.winner)
+        if ((self.training_level != '0') & (self.winner != '')):
+            # print summary
+            self.output()
 
-class Team():
-    # define teams
-    def __init__(self,players,score=0, space=0, displayname=''):
-        self.players = players
-        self.score = score
-        self.space = space
-        self.displayname = displayname
-        self.backup_score = 0
+            # write to csv
+            if len(self.history) == 0:
+                pd.DataFrame(dict(zip(self.history.columns,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
+                    (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)]).to_csv('history.csv', index=False)
+            else:
+                pd.concat([self.history,pd.DataFrame(dict(zip(self.history.columns,
+                    [self.training_player,dt.date.today(),self.game_name,self.training_level,
+                    (self.training_player == self.winner)*1,(self.training_player != self.winner)*1,
+                    self.total_score,self.total_turns,self.double_darts])),index=[len(self.history)])]).to_csv('history.csv', index=False)
 
-class Turn():
-    # define turns
-    def __init__(self,team='Team 1',player = 'Player 1',message ='',darts=[],number_dict={},opponent=[],numbers=[]):
-        self.team = team
-        self.player = player
-        self.message = message
-        self.darts = darts
-        self.number_dict= number_dict
-        self.opponent = opponent
-        self.numbers= numbers
+    def output(self):
+        pass
 
 class Player():
     # define teams
@@ -131,4 +171,4 @@ class Player():
         self.score = score
         self.space = space
         self.lives = lives
-        # Is this class actually being used anywhere?
+ # Is this class actually being used anywhere?

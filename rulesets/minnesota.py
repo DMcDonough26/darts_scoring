@@ -116,7 +116,7 @@ class Minnesota(TeamGame):
 
                     self.printscore()
 
-                    if ((current_turn.team.score > current_turn.opponent.score) and (min(current_turn.team.numbers) == 3)):
+                    if ((current_turn.team.score >= current_turn.opponent.score) and (min(current_turn.team.numbers) == 3)):
                         self.over = True
                         self.winner = current_turn.team.displayname
                     break
