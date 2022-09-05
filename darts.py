@@ -188,7 +188,5 @@ def main():
             current_game = ATW(name=start_game.name, players=start_game.players)
             current_game.rungame()
 
-# better understand need for default parameters in constructor methods for subclasses
-# there may be some unintentional memory assignments that are not causing problems
 
 main()

@@ -29,7 +29,7 @@ class Golf(SingleGame):
                 print(temp1,'\n\n')
 
                 temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
-                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(1)
                 print(temp2,'\n\n')
 
             except:
@@ -128,4 +128,4 @@ class Golf(SingleGame):
         print()
 
     def output(self):
-        print("Average Score: ",int(self.total_score/self.total_turns))
+        print("Average Score: ",round(self.total_score/self.total_turns,1))

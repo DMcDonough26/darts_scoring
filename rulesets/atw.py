@@ -27,7 +27,7 @@ class ATW(TeamGame):
 
                 temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
                     agg({'Total Score':'sum','Total Turns':'sum','Darts at Double':'sum','Win':'sum'})
-                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
+                temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(1)
                 print(temp2,'\n\n')
 
             except:
