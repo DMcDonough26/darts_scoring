@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.stats import binom_test
 
 from game_mechanics import SingleGame, TeamGame, Turn
 
@@ -29,6 +30,7 @@ class Legs(SingleGame):
             try:
                 temp1 = self.history.groupby(['Game','Level']).agg({'Win':'sum','Loss':'sum'})
                 temp1['%'] = (temp1['Win']/(temp1['Win']+temp1['Loss'])).round(2)
+                temp1['p_val'] = temp1.apply(lambda y: binom_test(x=y['Win'],n=(y['Win']+y['Loss']),p=0.5,alternative='greater').round(2),axis=1)
                 print(temp1,'\n\n')
 
                 temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).agg({'Total Score':'sum','Total Turns':'sum'})
