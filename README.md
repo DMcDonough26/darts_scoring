@@ -1,7 +1,7 @@
 # darts_scoring
-Python program designed to score various darts games from the command line
+Python program designed to score various darts games locally from the command line
 
-During COVID, some buddies and I began playing darts over zoom. I created this program so that I should share my screen and we could easily score various dart games.
+During COVID, some buddies and I began playing darts over zoom. I created this program so that I could share my screen and we could easily score various dart games.
 
 ** 2/1/2022 I've added a play-against-the-computer mode where you can specify the desired level of opposition for Legs, Golf, X01, and Cricket
 
