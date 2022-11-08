@@ -99,8 +99,8 @@ class Spanish(TeamGame):
                                         break
 
                         # simulate number of darts
-                        mean_dict = {'1':0.5,'2':1,'3':1.5,'4':2}
-                        sd_dict = {'1':0.25,'2':0.5,'3':0.5,'4':1}
+                        mean_dict = {'1':0.4,'2':0.5,'3':0.7,'4':1}
+                        sd_dict = {'1':0.25,'2':0.3,'3':0.45,'4':0.6}
                         value = min(max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0),3)
                         score_dict = dict(zip([3,2,1],['t','d','s']))
                         if value == 0:

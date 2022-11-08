@@ -61,8 +61,8 @@ class ATW(TeamGame):
                 # if opponent is up sample from distribution
                 if current_turn.player == 'Opponent':
                     # simulate turn value from distribution
-                    mean_dict = {'1':0.5,'2':1,'3':1.5,'4':2}
-                    sd_dict = {'1':0.25,'2':0.5,'3':0.5,'4':1}
+                    mean_dict = {'1':0.4,'2':0.5,'3':0.7,'4':1}
+                    sd_dict = {'1':0.25,'2':0.3,'3':0.45,'4':0.6}
                     value = max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0)
                     bull_dict1 = {'B':0,'BB':-1,'BBB':-2}
                     bull_dict2 = {0:'B',-1:'BB',-2:'BBB'}

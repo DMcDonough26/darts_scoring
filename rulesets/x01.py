@@ -29,7 +29,7 @@ class X01(TeamGame):
                 temp1['p_val'] = temp1.apply(lambda y: binom_test(x=y['Win'],n=(y['Win']+y['Loss']),p=0.5,alternative='greater').round(2),axis=1)
                 print(temp1,'\n\n')
 
-                temp2 = self.history[self.history['Game']==self.game_name].groupby(['Level']).\
+                temp2 = self.history[self.history['Game']==str(self.game_name)].groupby(['Level']).\
                     agg({'Total Score':'sum','Total Turns':'sum','Darts at Double':'sum','Win':'sum'})
                 temp2['Average Score'] = (temp2['Total Score']/temp2['Total Turns']).round(0)
                 temp2['Double Rate'] = (temp2['Win']/temp2['Darts at Double']).round(2)
@@ -76,7 +76,7 @@ class X01(TeamGame):
                             darts += 1
                             continue
                         elif ((score <= 40)&(score%2==0)):
-                            double_dict = {'1':0.05,'2':0.1,'3':.17,'4':.25}
+                            double_dict = {'1':0.04,'2':0.08,'3':.12,'4':.20}
                             if (np.random.binomial(1,double_dict[self.training_level]) == 1):
                                 darts = int(score)
                                 break
