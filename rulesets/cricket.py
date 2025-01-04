@@ -110,7 +110,7 @@ class Cricket(TeamGame):
                             target = "Bull"
                         else:
                             pass
-                        mean_dict = {'1':0.4,'2':0.5,'3':0.7,'4':1}
+                        mean_dict = {'1':0.5,'2':0.63,'3':0.77,'4':0.9}
                         sd_dict = {'1':0.25,'2':0.3,'3':0.45,'4':0.6}
                         value = min(max(round(np.random.normal(mean_dict[self.training_level],sd_dict[self.training_level])),0),3)
                         score_dict = dict(zip([3,2,1],['t','d','s']))
@@ -228,3 +228,4 @@ class Cricket(TeamGame):
 
     def output(self):
         print("Average Score: ",round(self.total_score/self.total_turns,1))
+        print("Total Darts: ",self.total_turns*3)
